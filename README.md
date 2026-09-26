@@ -8,7 +8,7 @@ This isn't a complete list of everything I've made. It's just the stuff I happen
 
 Projects I remember clearly and know are interactive/runnable.
 
-### Multi-day projects
+### Multi-week projects
 
 * silly-car-game134 — 2D physics-based racing game where you build your own car
 * dubiousdl — Neural-network library and MNIST dataset experiments
