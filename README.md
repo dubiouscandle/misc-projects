@@ -10,14 +10,15 @@ Projects I remember clearly and know are interactive/runnable.
 
 ### Multi-day projects
 
-* [`silly-car-game134`] - 2D physics-based racing game where you build your own car
-* [`dubiousdl`] - Neural-network library and MNIST dataset experiments
-* [`pointphysics`] - Position Based Dynamics (PBD) physics engine and experiments
-* [`north_korea_game`] - A silly negotiation game involving the leader of North Korea
+* silly-car-game134 - 2D physics-based racing game where you build your own car
+* dubiousdl - Neural-network library and MNIST dataset experiments
+* Evo — Physics simulation where virtual creatures evolve their bodies and neural networks at the same time
+* pointphysics - Position Based Dynamics (PBD) physics engine and experiments
+* north_korea_game - A silly negotiation game involving the leader of North Korea
 
 ### Small projects
 
-Projects that took less than a day.
+Projects that took between 1 day to 1 week.
 
 * [`dragoncurvegenerator`] - Interactive Dragon Curve renderer
 * [`poly smash`] - 2D arcade-style game
