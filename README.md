@@ -30,5 +30,4 @@ The rest of the archive is a grab bag of experiments, USACO practice, half-finis
 
 Some projects probably don't work anymore. Some folders might contain nothing more than a weird experiment I made one afternoon. There are almost certainly things in here that I've forgotten entirely.
 
-There are probably more hidden gems in here that I've completely forgotten about. I have no idea what's in half of these folders anymore. Have fun digging. have completely forgot about. Have fun digging.
-
+There are probably more hidden gems in here that I've completely forgotten about. I have no idea what's in half of these folders anymore. Have fun digging.
