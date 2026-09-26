@@ -1,0 +1,16 @@
+Angry
+Happy
+Sly
+NA
+VeryAngry
+Sad
+Neutral1
+Neutral2
+Evil
+Intimidating
+WTF
+Yapping
+Done
+Begging
+Desperate
+MegaAngry

@@ -1,0 +1,380 @@
+107
+NA 0  Choose your issue to start:
+Angry 1 Kim: Our nuclear weapons keep us safe from the western imperial countries like yours! We need them for survival against the numerous of evil countries praying on our downfall
+VeryAngry 2 Kim: How dare you! You are a disgrace of a human being! I will give you one chance to take that back before I send you to the North Korean Gulag!
+Angry 3 Kim: You were the one who set up this meeting, stop wasting my time and tell me what you are here for!
+Angry 4 Kim: We are fine on our own! We are already receiving pitiful aid from South Korea, and we don’t need anymore.
+Angry 6 Kim: How dare you insult our government!
+Intimidating 7 Kim: Your offer will only go to waste in our utopia! I would prefer to discuss something else.
+VeryAngry 8 Kim: Are you saying I am not serving my people?! It is my country and I will do what I want to it and its population how I want it!
+Angry 9 Kim: There is nothing to talk to us. It is our right and destiny as the greatest nation in the world to develop whatever we would like!
+VeryAngry 10 Kim: How dare you threaten us! How would you like us to nuke you!
+WTF 11 Kim: Why should we care about what you or other countries are doing? We need our nuclear weapons to counter attacks from Western countries like the US!
+VeryAngry 12 Kim: Take that back immediately! I will send you to the North Korean Gulag if you keep up with these shenanigans!
+Sad 13 Kim: How are we supposed to continue if you keep insulting and harassing me?
+Angry 14 Kim: How dare you accuse me of lying? I would never do such a thing!
+Neutral1 15 Kim: What were we talking about again? Remind me
+MegaAngry 16 Kim: What are you doing?! Try to hypnotize me?! That is extremely unacceptable! You are being sent to the work camps!
+NA 17 Tragic ending: You were sent to the North Korean prison camps and are going to rot away in them for the rest of your short life in the DPRK
+VeryAngry 18 Kim: You are disgusting! I will send you to my worst prisons!
+VeryAngry 19 Kim: You are disgusting! I will make sure you will never see the light of day again!
+VeryAngry 20 Kim: I have before and will again! To prison you go!
+Yapping 21 Kim: Our infrastructure is the best in the world! Much more efficient than any country’s, especially the Western ones!
+Yapping 22 Kim: The North has always been superior to the South! You know what, we don’t need anything from you. This conversation is over!
+Angry 23 Kim: Yes, as I have said before we don’t need a drop of your stupid aid!
+Yapping 24 Kim: You have no right to critique my perfect rule of the DPRK!
+Neutral2 25 Kim: We are fine and don’t need any aid!
+Angry 26 Kim: I don’t believe you! You are aligned with South Korea and all they want to do is take away our perfect country!
+Angry 27 Kim: How can I trust that the bringers of aid won’t spread lies to our people or do anything else bad!
+Angry 29 Kim: You have done nothing but harm us throughout history! You destroyed our land during the Korean War and have continued to try to weaken us!
+Begging 30 Kim: Okay I guess, there is no harm in aid and my people do need help. Please send us plenty of food, water, and medical supplies.
+Happy 31 Kim: Thank you for your help.
+Done 32 Kim: We are fine on our own! We don’t need to continue talking, this conference is over!
+NA 33 Humanitarian ending: Congratulations! You have successfully negotiated with the North Koreans to help their people.
+MegaAngry 34 Kim: You are disgusting! You wanted to give us free aid for our people! I am imprisoning you for your actions!
+MegaAngry 35 Kim: PLEASE STOP!
+MegaAngry 36 Kim: PLEASE STOP!
+VeryAngry 37 Kim: Stop saying “Why?”
+Neutral1 38 Kim: RAAAAAAAHHH!!  *Collapses and is clutching his chest*
+NA 39 Secret Ending: Wow! You have found the secret ending! Through pure stupidity, you stressed Kim out so much that you gave him a heart attack! No one knows what will be in store for North Korea’s future, but there is a sliver of hope for a better chance for the people.
+VeryAngry 40 Kim: How dare you refuse to listen to me!
+Angry 41 Kim: Stop asking questions!
+VeryAngry 42 Kim: How dare you say that! I will send you to the worst prison I have!
+Sly 44 Kim: As I said, our country is perfect! We don’t need any aid.
+VeryAngry 46 Kim: I will make sure you regret what you said! To the prison camps you go!
+Neutral2 47 Kim: Very well, then. What other more important topics would you like to discuss?
+NA 48 Nuclear ending: Due to your careless actions, you have started a nuclear war. Millions of Americans, Koreans, and peoples all over the world have perished in the explosions and radiation effects.
+NA 49 No resolution ending: The negotiations have ended in more distrust and tensions, leaving you if at the best the same as it was before. It will be a while before North Korea will open up again.
+Done 50 Kim: You know what? I’m done with these useless negotiations, now leave!
+Yapping 51 Kim: You threatened us with empty violence, why should we continue to negotiate?
+Yapping 52 Kim: I’ll prove you wrong!
+Done 53 Kim: You have no right to critique our perfect form of government! First you threaten us with destruction, and now you insult our country! We are done with this negotiation!
+Angry 54 Kim: I am not so sure I would like to continue after your verbal attacks. Give me one good reason for me to carry on.
+VeryAngry 55 Kim: Disgusting! I will personally assure you that you are tortured in my worst prison camp!
+Intimidating 57 Kim: Go ahead and impose more sanctions! We don’t need other countries’ imports anyways!
+Angry 58 Kim: I am unwilling to budge on the topic of nuclear weapons after you just threatened to stop my country’s minimal imports.
+NA 62 Tragic ending: You were sent to the North Korean prison camps and are going to rot away in them for the rest of your short life in the DPRK
+Angry 60 Kim: I will give you one chance to take that back before I send you to the North Korean Gulag!
+VeryAngry 61 Kim: Disgusting! To the work camps you go!
+Happy 3000 Kim: Do not lecture me on how to run a country! There is a reason why North Korea is the best one in the world  is because of our fearless leaders.
+Sly 63 Kim: Well what are you going to do? Just impose more useless sanctions?
+Done 64 Kim: I agree, this conference has done nothing!
+Yapping 65 Kim: You don’t know a thing about the DPRK, how can you make up these belligerent allegations?
+Neutral2 66 Kim: Okay.
+Done 68 Kim: It is too late, this conversation has dragged on long enough.
+Desperate 69 Kim: Our power supply has been faltering lately, if you send electricity to us then we will be more open to working with you.
+VeryAngry 70 Kim: What you sent was not nearly enough! We want more to continue talking!
+Intimidating 71 Kim: We don’t need any electricity from you! We are fine on our own.
+Intimidating 72 Kim: As I have said, we are completely fine.
+Done 73 Kim: We don’t need anything from you. You know what, there is no reason for this conference to continue. I’m going to leave.
+Neutral2 74 Kim: Well, then. What other topics would you like to discuss?
+Neutral1 75 Kim: There is nothing of value that you can give us in exchange for denuclearization. They are the pride of our country! America just feels threatened when a country they don’t like gets ahold of nukes!
+Sly 76 Kim: I won’t do anything before you give me something first!
+Sly 77 Kim: Haha thanks for all the free electricity. I don’t think I need you anymore.
+NA 78 Scam ending: You tried your best but Kim got the best of you and scammed you out of recourses. Better luck next time!
+Done 79 Kim: I thought we were working towards better relations! There is a reason why we never worked together! We are done with this conference.
+VeryAngry 80 Kim: How can I trust anything you say? You invaded our homeland during the Korean war and have continued to hit us with sanctions!
+Angry 81 Kim: Stop spreading these lies! I should’ve known better than to set up this meeting with you.
+Done 82 I don’t care. This conversation is over.
+VeryAngry 83 Kim: How dare you say that! I will send you to the worst prison I have!
+Angry 85 Kim: Actually no, I’ve changed my mind. I can’t work with the imperialist Americans!
+Begging 86 Kim: I guess I have no other choice. I will make sure my nuclear facilities are repurposed.
+WTF 87 Kim: What the heck, you are so weird. Get out of here, the deal’s off.
+VeryAngry 88 Kim: I am sure that I will never conspire with the evil Americans ever!
+VeryAngry 89 Kim: You demonic Americans almost got me! Leave now before I imprison you for what you’ve done!
+VeryAngry 90 Kim: I don’t need to rethink anything! You are just trying to swindle me into giving up my only protection!
+Angry 91 Kim: How are you helping us with these untrustworthy trades?
+Happy 92 Kim: The North Korean people are already the happiest in the world! They live in the most perfect country! We don’t need any of your help.
+Happy 93 Kim: Our public transport system is the best in the world! Much better than yours!
+Happy 94 Kim: Our elections are perfect the way they are, we don’t need any of your help!
+Neutral1 95 Kim: Okay.
+Done 97 Kim: It is too late, this conversation has dragged on long enough.
+WTF 98 Kim: Dang how can your big, rich government not even achieve adequate public transportation for the American population? That’s pretty embarrassing.
+VeryAngry 99 Kim: How dare you insult me!
+Desperate 100 Kim: You make a good point. If our factories can reconstruct our economy. Fine, I’ll agree to denuclearization.
+NA 101 Denuclearization? Ending: You leave feeling proud of yourself for negotiating the first steps of denuclearization with the DPRK, however you realized that you have no way to know that they are actually complying with the agreement. There is a good chance that they are actually continuing to develop nuclear weapons behind America’s back.
+Sad 102 Kim: Do we really need to send UN workers to my utopia?
+Desperate 103 Kim: Fine, I will comply to all the agreements. Please send the electricity.
+NA 104 Denuclearization! Ending: Congratulations! You have successfully achieved the most difficult ending in the game! In real life, this would be essentially impossible to keep, but you have done it in this simulation. Good job!
+Happy 105 Kim: I have received the first shipment of electricity, thank you for helping us. I have sent the orders for the deconstruction of nuclear facilities.
+VeryAngry 106 Kim: What is this? This minuscule amount of power is insulting! The deal is off! Now get out of my sight!
+Done 1000 Kim: You know what? This conversation is over, we don’t need any of your help anyways!
+NA 1001 Sanctions ending: You imposed sanctions which target military weapons, parts, and luxury goods for the elite. However, this will fail to do much and North Korea’s anger will only grow for the Western nations.
+VeryAngry 1002 Kim: I was trying to work with you! I am disgusted by your hypocrisy and drive towards real results! I would like to end this conference now.
+Happy 1004 Kim: We as the greatest country in the world don’t need help from anyone else! Contacting with other nations is just a waste of time.
+Angry 1005 Kim: I don’t believe you! You are aligned with the evil South! All they want to do is take over our side of Korea and spread its false narratives and evil ideas!
+Intimidating 1006 Kim: I somehow thought that you had something of value to offer me, but I was clearly wrong. We are done with this.
+Neutral1 1007 Kim: Okay, what do you want to talk about.
+Neutral1 2000 Kim: Nuh uh
+
+271
+30 31 Of course! This is the least the United States could do.
+30 34 I will, but I want something in return…
+30 31 The United Nations is committed to sending aid to help your people!
+30 34 You know what? I don’t think I want to send aid anymore.
+31 33 <>
+32 49 <>
+1000 49 <>
+29 1000 <>
+27 30 We assure you that this is just to feed your people. We will make sure that it gets to you promptly and efficiently.
+27 26 The workers won’t do anything.
+27 29 Why don’t you trust us!?
+27 26 You can believe us. I want to help your people and improve our relations.
+26 29 We just want to help your people, Kim.
+26 30 What bad things will happen if you accept our aid?
+26 42 Your country is the furthest from perfect! It is your responsibility to take care of your people, and you won’t even accept someone doing that for you!
+24 42 Your rule is terrible! Your people live the worst lives in the world!
+24 32 I am saying that you need to wake up! You need help!
+24 12 Your leadership is not doing good things for your people, please let us help you.
+24 32 I’m not trying to offend you, I am trying to convince you to help your people!
+25 47 Ok then, let’s talk about something else.
+25 66 If you don’t want our help, then I will just leave!
+25 24 Kim, your people are starving due to your irresponsibility! At least accept aid for their sake!
+25 27 Please, there are no downsides to accepting aid. It will just help your people.
+23 25 I must persist for us to offer aid. We believe that your people need it.
+23 49 Ok. I’ll leave now.
+23 47 Well then, let’s talk about something else.
+23 42 You are an evil dictator who won’t even accept aid for his starving people! You are a monster!
+42 17 <>
+34 17 <>
+37 36 Why?
+37 47 Ok, sorry let’s get back on track.
+36 35 Why?
+36 47 Ok, sorry let’s get back on track.
+35 38 Why?
+35 47 Ok, sorry let’s get back on track.
+38 39 <>
+14 75 I know that it is hard for you to admit, but you need our help.
+14 75 I’m just saying you are the one who needs our help.
+15 18 Yes, all you do is lie and trick others! You should be imprisoned for what you’ve done!
+14 13 I didn’t mean to insult you.
+13 49 I guess you are right, I’ll leave now.
+13 18 You have been the one who has done bad things!
+13 1 I promise I won’t do it again, let’s restart from a new beginning.
+22 49 <>
+21 22 The North has seriously fallen behind the South, we are offering you a chance to change a major factor in the quality of life of people in the DPRK.
+16 17 <>
+1007 18 Just kidding, you are super fat and stinky.
+1007 16 *Use hypnosis to make him forget everything*
+1007 4 Let's talk about how we can help your country and its people.
+1007 18 I want to continue roasting you about how nasty you are.
+18 17 <>
+15 0 We just sat down and began our discussion about the future relations of our 2 countries.
+41 40 No.
+41 47 Ok, sorry let’s get back on track.
+41 37 Why?
+40 12 You have no right to say what I can and can’t do!
+40 3 I’m sorry, what would you like to discuss?
+44 6 Your government has failed your population. People are starving, you need aid!
+44 41 Why?
+44 23 Are you sure?
+44 47 Okay, let’s talk about something else.
+7 44 Why?
+7 3 Okay, what would you like to discuss?
+7 23 Are you sure you don’t want to receive aid?
+7 6 Your country is the furthest from a utopia...
+46 17 <>
+6 47 I’m sorry Kim, it was merely a remark. I will refrain from further side comments
+6 46 Your government sucks and I don’t regret saying a thing.
+6 47 I regret saying that. It was a mistake.
+6 46 Your form of government is terrible, it is filled with corruption and greed!
+20 17 <>
+19 17 <>
+12 20 You won’t! You wouldn’t dare kill an American!
+12 19 I said what I said and I mean it!
+12 1007 I didn’t mean what I said, let’s get back to the conversation.
+12 13 I am terribly sorry about what I said, I didn’t mean to offend you so harshly. I just wanted to give you a wakeup call.
+21 75 More electricity can help power your country and get the it back on its feet!
+21 14 Kim, both you and I know that is a lie.
+0 1 Kim Jong Un it is a pleasure to meet you, however we must discuss the problem at hand your nuclear weapons are a threat to the world
+0 4 North Korea’s people are starving. We would like to offer humanitarian aid to help the people.
+0 3 What would you like to talk about?
+0 2 Kim, you are a big fat idiot and I am just here to insult you and see what happens
+4 8 Kim, your people are starving, it is imperative that we arrange a deal for more aid.
+4 7 The United Nations is concerned for your population. We would like to arrange aid such as food, water, and medical supplies to be sent.
+4 1 Ok I guess, if you think you are fine, then you are fine. Let’s talk about your nuclear weapons.
+4 8 You are denying your people the right to food while you lavish in your riches. I demand that you give up your lifestyle and be responsible for your people!
+1 71 Will you consider a trade including us sending you power in exchange for the deconstruction of nuclear weapons research facilities?
+1 57 Kim, we will impose even harsher sanctions against you if you do not take actions to disarm yourself
+1 63 We believe that your nuclear weapons pose a danger to everyone, especially your threats against the United States. There is a reason why your country is in ruins and bombarded by sanctions.
+1 3000 Your country is in deep poverty, yet you still pursue nuclear weapons? You are digging yourself a deeper hole for the future of North Korea!
+63 1001 Yes. This will be the end of this fruitless conference.
+63 1001 Oh these ones won’t be useless.
+63 9 No, this is why I would like to further our conversation about your development of WMDs.
+63 71 I would rather not. I am trying to make an agreement that would help each of us, and the world. Would you consider a trade of some of our power supply to help your country?
+64 49 <>
+52 48 <>
+53 49 <>
+50 49 <>
+51 54 Sorry Kim, it was a misunderstanding. I would like to get back on track and continue the discussion.
+51 52 Do not say the US Military cannot perform it’s actions, stand back Kim.
+51 50 We are trying to achieve world peace, but you are making this difficult with your aggression.
+51 53 You should negotiate with us because we are superior! Your country is crumbling and your people are starving. You have no other choice.
+11 49 You know what? I give up. You can keep your nukes.
+11 57 Other countries won’t want to engage in commerce with you if you threaten or endanger others! In fact, we will put even more sanctions in place!
+11 1005 No Western countries want to attack you!
+11 10 Your crude nukes couldn’t even stop our attacks! We could easily steamroll you!
+2 0 Sorry Kim, that just slipped out. I would like to get back on track.
+2 0 What? I didn’t say that, it must’ve been the wind.
+2 0 I didn’t mean that, let’s restart.
+2 55 I said it and I meant it! You are stupid.
+55 17 <>
+57 1001 I would rather not impose sanctions, but you leave me no choice.
+57 1001 We’ll see about that after I sanction all of your military weapons and lavish goods!
+57 1 Okay, I didn’t mean to create more hostile tensions, let’s get back to talking about nuclear weapons.
+57 58 I was just giving a potential consequence if you don’t work with us. Please let’s continue chatting.
+60 9 I’m sorry sir thank you for the last chance. Let’s continue to talk about denuclearization.
+60 61 I meant what I said! North Korea is the worst country on earth!
+61 62 <>
+3000 60 Yeah right, all you and the 2 other Kims have done is create a country that can’t even feed its own people.
+3000 3 It’s not worth arguing with you on this one, what would you rather talk about?
+3000 60 You persist in creating nukes while your people starve, what kind of leader does that?
+3000 60 Your family’s dynasty has been unsuccessful at best! North Korea has the worst leadership of the modern world!
+103 104 Okay, I will send you the adequate amounts now.
+103 106 Okay, I will send you a tiny, little, eeny-weeny, bit of power.
+106 49 <>
+102 103 Yes, this is part of the agreement.
+102 103 Yes, we need to make sure that you aren’t still making nukes.
+102 101 If you don’t want that, then we don’t need it.
+102 99 Your “utopia”? The DPRK is far from that.
+100 101 Thank you for your cooperation.
+100 102 Good, but I want UN representatives to check periodically with your facilities that they aren’t still being used.
+100 87 Yay! I did it!
+100 102 You know what, keep your nukes, I’m not sending that electricity.
+99 79 <>
+98 49 You’re right, I’m so embarrassed I’m leaving now.
+92 12 Kim, that’s is the biggest lie I have ever heard.
+92 95 Okay, I guess I will leave now.
+92 83 Your own people are starving! How can they be happy! You truly have no feelings for those under your tyrannical rule!
+92 77 Okay, if you are not willing to budge on denuclearization, let’s talk about something else.
+91 92 Electricity will help your people be happy.
+91 100 Electricity will help your factories function.
+91 93 Electricity can help improve your public transportation systems.
+91 94 Electricity can be used to power electronics to help make elections easier.
+93 98 You know what, I actually don’t know anything about the DPRK’s public transportation, but based on the American public transport, this might be true.
+93 83 Don’t talk to me like that! You have no right to insult our systems when yours has collapsed!
+93 74 Okay, let’s move on to another topic.
+93 95 Okay, if we can’t come to a consensus then I will leave now.
+97 49 <>
+94 95 Okay, I guess I will leave now.
+94 83 Your elections are far from perfect! Everyone else besides your own people who you are lying to know that you are an evil dictator!
+94 97 Please, let me try again.
+94 74 Let’s talk about something else, then.
+95 49 <>
+90 91 Please understand that we are trying to help you.
+90 1005 We do not want to hurt you or convey any distrust.
+90 21 We just want to improve your infrastructure and the living conditions of your people!
+90 95 If you are unwilling to budge, then I will be leaving.
+83 17 <>
+89 49 Okay, I’m leaving.
+89 83 We have done nothing wrong, you are the one who keeps insulting me!
+89 83 You are an ignorant dictator who doesn’t care about others!
+89 49 I’ll get going, but you’ll regret the decision you made today.
+88 89 I’m done with this! Why can’t you ever just agree to a solution!?
+88 1005 Kim, I assure you that the Americans or any other country is plotting against you.
+88 90 Please rethink your decision, we were so close to agreeing on something.
+88 65 I urge you to agree to this deal, it has the potential to help restart North Korea’s ruined economy!
+87 49 <>
+2000 78 <>
+85 88 Are you sure? I thought you needed power.
+85 74 Very well, let’s talk about something else
+85 2000 I sent you the power already! I thought we were supposed to be closer now!
+85 83 OH MY GOSH WE WERE SO CLOSE. YOU ARE SO STUPID!
+86 85 Thank you for your cooperation.
+86 85 Good, but I want UN representatives to check periodically with your facilities that they aren’t still being used.
+86 87 Yay! I did it!
+86 1002 You know what, keep your nukes, I’m not sending that electricity.
+77 78 <>
+1006 49 Okay, let’s end this conference.
+1006 68 I’m sorry, please let’s continue.
+1006 83 You know what, you are a big, fat, idiot!
+81 49 Please don’t go! I am sorry.
+81 68 I feel the same. I’m leaving.
+81 1006 You have no attitude for progress! Why did you even come in the first place!
+81 82 We still have more to talk about!
+82 49 <>
+79 49 <>
+66 49 <>
+76 70 Fine I will send you some electricity.
+76 79 No. I want you to deconstruct things first.
+76 77 Okay, I’ll give you all the extra electricity we have.
+76 1002 I’ve decided to not send power anymore.
+80 81 You are the one who started the war and constantly threaten nuclear war!
+80 69 We are sorry for hurting anyone or destroying anything during the war, what would you want to strengthen peace between our 2 parties?
+80 12 You kill your people and throw them in work camps! And you wonder why no one likes you?
+80 1005 America doesn’t want to overthrow your government or change anything politically on the Korean peninsula, we just want peace and safety for everyone.
+1005 1005 That is not what the South or America is doing at all, we want to help improve world peace.
+1005 49 I am sick and tired of your lies. I am leaving.
+1005 12 You are the one who is evil! How can your government invest all of your funds into WMDs and starve your people!
+1005 75 We just want denuclearization, what do you want!?
+70 77 Okay I will send more.
+70 86 I will give more to you if you help work towards denuclearization.
+70 6 If you want more power, go ask your friend China! I thought they supplied you with most of it anyways!
+70 6 I’m not giving you anymore, you ungrateful scoundrel!
+69 70 Okay, we will do that.
+69 76 I want results before sending anything to you, we want you to shut down your nuclear weapons research facilities and factories.
+69 1002 I thought you said before that you didn’t need power, what changed your mind?
+69 1002 I am not open to sending power, you don’t deserve any help.
+68 49 <>
+1002 68 Wait, I am sorry I didn’t mean to get off track.
+1002 12 I have been talking to you, you have been the one who is not doing anything!
+1002 49 I would as well, let’s end this here.
+1002 66 Before we go I would like to say that it was a pleasure to work with you.
+75 80 That is wrong. We are not jealous or harbor ill intentions. We are working to improve world peace for everyone!
+75 11 Why are you so resistant? Almost every other country is working towards denuclearization.
+75 69 We need to work towards a solution that prioritizes world peace, what can we do to get you onboard?
+75 1 I must ask why you are so attached to your nuclear weapons?
+74 4 I would like to discuss opportunities in sending humanitarian aid.
+74 65 You human rights violations are atrocious, I demand an explanation!
+74 6 This conversation has gone no where with your resistance, I’m going to leave.
+74 83 I would like to talk about the topic of how ugly your face is.
+71 72 I know that you run low on electricity, for you country’s sake I must persist in asking.
+71 73 If you do not want electricity, are there any other forms of trade you would engage in?
+71 1004 We need to establish cooperation to help each other. This is an opportunity to help establish ties with other countries of the world
+71 65 Your country is bombarded by blackouts on and extremely frequent basis! How can you say you don’t need help?
+58 9 Please, we must continue to talk about your develop of WMDs. World peace is at stake.
+58 4 Okay, let’s talk about helping your people and receiving humanitarian aid.
+58 9 I am sorry for threatening you, but we have to continue talking about your nuclear weapons.
+58 3 Okay, then what other topics would you like to talk about?
+54 75 I would like to make the most out of this opportunity. I believe you also have a chance to receive valuable recourses in a trade for denuclearization.
+54 57 If you do not continue this with us, we will harshen our sanctions.
+54 53 You should carry on because your government sucks and it will soon collapse!
+54 22 I believe that we can help stabilize your country and help get North Korea back on par with the South.
+3 4 Sorry, I would like to discuss an opportunity for your people to receive humanitarian aid
+3 1 Kim, your actions concerning WMDs are dangerous and concerning. We must find a solution that takes action instead of just putting it off.
+3 9 Your crimes against humanity cannot be ignored! You and your cronies should be imprisoned for what you have done to innocents!
+3 12 I am here to insult you and call you a big, fat, bozo.
+47 1 I would like to bring up the topic of your nuclear arsenal.
+47 4 Thank you, I would like to get back on track with the objective of humanitarian aid.
+47 75 I would be interested in your thoughts on receiving electricity in exchange for denuclearization.
+47 65 I disapprove of the human rights violations happening in North Korea, how can you do that to your people?
+65 74 I did not mean to insult you, let’s go discuss another topic.
+65 12 The statement I said was factual, is your ego so important that you have to lie about the harm you are doing to your people.
+65 49 It is not worth engaging in conversation with you anymore, I’m leaving.
+72 75 Are you sure? We can grant you enough power to power your factories and help your cities and people!
+72 74 Okay, let’s talk about a different issue then.
+72 75 What else can we give you to convince you of denuclearization?
+72 57 You must engage in a deal with us or we will impose harsh sanctions.
+73 74 Please, we were just getting started we can talk about something else.
+73 75 We must persist in talking about denuclearization. It is one of the biggest factors of instability and threats of world peace!
+73 57 If you leave I will impose more sanctions, you do not want that.
+73 49 Okay.
+1004 11 Working together is the way of the modern world and the aim of the United Nations! Please denuclearize for the sake of the progress of society!
+1004 64 Okay, if you believe that then we can end this contact now.
+1004 11 Every other country urges you to stop your nuclear weapon research, no one wants more conflict.
+1004 74 If you are not willing to discuss denuclearization in a meaningful way then let’s move on to something else.
+9 11 Nuclear weapons endanger the entire world! We are all working to dismantle them for world peace.
+9 11 Kim, you stand among super powers on the world stage. You stand no chance and we would like you to get rid of your nuclear weapons.
+9 11 Your constant threats of usage of nuclear weapons is unacceptable, you need to denuclearize if you want to engage with other countries.
+9 10 The United States doesn’t care about you or your country! We can flatten it a 1,000 times over if you don’t get rid of your nukes!
+105 104 <>
+8 82 No, that is not at all what I am saying! The US believes it should help peoples all over the world.
+8 12 This is definitely what I am saying. You are a corrupt and irresponsible dictator!
+8 7 Your population is in deep poverty. We would like to help the people get back on their feet.
+8 42 I am merely advising you to stop being so greedy when your population has nothing.
+10 48 Go ahead and try buddy, your nukes can’t touch us
+10 74 Woah, let’s chill out and get back on track. We would like to peacefully negotiate. Let’s talk more.
+10 48 You know what, come at us. I’m tired of useless negotiating, we are going to destroy your country Kim.
+10 49 This is getting too out of hand. We are done.
+
+

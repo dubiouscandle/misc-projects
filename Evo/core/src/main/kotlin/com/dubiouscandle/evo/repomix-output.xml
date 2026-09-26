@@ -1,0 +1,1535 @@
+This file is a merged representation of the entire codebase, combined into a single document by Repomix.
+
+<file_summary>
+This section contains a summary of this file.
+
+<purpose>
+This file contains a packed representation of the entire repository's contents.
+It is designed to be easily consumable by AI systems for analysis, code review,
+or other automated processes.
+</purpose>
+
+<file_format>
+The content is organized as follows:
+1. This summary section
+2. Repository information
+3. Directory structure
+4. Repository files (if enabled)
+5. Multiple file entries, each consisting of:
+  - File path as an attribute
+  - Full contents of the file
+</file_format>
+
+<usage_guidelines>
+- This file should be treated as read-only. Any changes should be made to the
+  original repository files, not this packed version.
+- When processing this file, use the file path to distinguish
+  between different files in the repository.
+- Be aware that this file may contain sensitive information. Handle it with
+  the same level of security as you would the original repository.
+</usage_guidelines>
+
+<notes>
+- Some files may have been excluded based on .gitignore rules and Repomix's configuration
+- Binary files are not included in this packed representation. Please refer to the Repository Structure section for a complete list of file paths, including binary files
+- Files matching patterns in .gitignore are excluded
+- Files matching default ignore patterns are excluded
+- Files are sorted by Git change count (files with more changes are at the bottom)
+</notes>
+
+</file_summary>
+
+<directory_structure>
+Anatomy.kt
+Brain.kt
+ClimbingSimulator.kt
+Creature.kt
+Genome.kt
+Main.kt
+RunningSimulator.kt
+SimpleMutator.kt
+SoloSimulator.kt
+todo.txt
+Utils.kt
+</directory_structure>
+
+<files>
+This section contains the contents of the repository's files.
+
+<file path="Anatomy.kt">
+package com.dubiouscandle.evo
+
+class Anatomy() {
+    val nodes = ArrayList<Node>()
+    val edges = ArrayList<Edge>()
+
+    constructor(anatomy: Anatomy) : this() {
+        val nodeMapOldToNew = HashMap<Node, Node>()
+
+        for (oldNode in anatomy.nodes) {
+            val newNode = Node(
+                oldNode.x, oldNode.y, oldNode.mass, oldNode.friction,
+                oldNode.restitution,
+                oldNode.xOffsetAddress,
+                oldNode.yOffsetAddress,
+                oldNode.xVelocityAddress,
+                oldNode.yVelocityAddress,
+                oldNode.contactAddress,
+                ArrayList()
+            )
+            for (sensor in oldNode.sensors) {
+                newNode.sensors.add(Sensor(sensor.range, sensor.inputAddress))
+            }
+            nodeMapOldToNew[oldNode] = newNode
+            nodes.add(newNode)
+        }
+        for (oldEdge in anatomy.edges) {
+            val newEdge = Edge(
+                nodeMapOldToNew[oldEdge.nodeA]!!, nodeMapOldToNew[oldEdge.nodeB]!!,
+                oldEdge.stiffness,
+                oldEdge.damping,
+                oldEdge.compressionRatio,
+                oldEdge.contractionInputAddress,
+                oldEdge.contractionOutputAddress,
+            )
+            edges.add(newEdge)
+        }
+    }
+
+    class Node(
+        var x: Float,
+        var y: Float,
+        var mass: Float,
+        var friction: Float,
+        var restitution: Float,
+        var xOffsetAddress: Long = InnovationTracker.getNextAddress(),
+        var yOffsetAddress: Long = InnovationTracker.getNextAddress(),
+        var xVelocityAddress: Long = InnovationTracker.getNextAddress(),
+        var yVelocityAddress: Long = InnovationTracker.getNextAddress(),
+        var contactAddress: Long = InnovationTracker.getNextAddress(),
+        val sensors: ArrayList<Sensor> = ArrayList()
+    )
+
+    class Edge(
+        var nodeA: Node,
+        var nodeB: Node,
+        var stiffness: Float,
+        var damping: Float,
+        var compressionRatio: Float,
+        var contractionInputAddress: Long = InnovationTracker.getNextAddress(),
+        var contractionOutputAddress: Long = InnovationTracker.getNextAddress(),
+    )
+
+    class Sensor(
+        var range: Float,
+        var inputAddress: Long = InnovationTracker.getNextAddress(),
+    )
+}
+</file>
+
+<file path="Brain.kt">
+package com.dubiouscandle.evo
+
+import com.badlogic.gdx.utils.LongMap
+import kotlin.math.tanh
+
+class Brain {
+    val connections = ArrayList<Connection>()
+    val bindings = LongMap<Node>()
+    val nodes = ArrayList<Node>()
+
+    class Connection(
+        val from: Node,
+        val to: Node,
+        var weight: Float,
+        val innovationId: Long = InnovationTracker.getNextAddress() // FIX: Added innovation ID to track connection history for dual-topology speciation
+    )
+
+    @JvmInline
+    value class OutputId(val address: Long)
+
+    class Node(
+        var bias: Float = 0f,
+        val innovationId: Long = InnovationTracker.getNextAddress() // FIX: Added innovation ID to track neural node history for dual-topology speciation
+    )
+
+    fun processor(): Processor = Processor(this)
+
+    class Processor(brain: Brain) {
+        private val nodeCount = brain.nodes.size
+        private val state = FloatArray(nodeCount)
+        private val nextState = FloatArray(nodeCount)
+        private val biases = FloatArray(nodeCount)
+        private val addressToIndex = LongMap<Int>()
+        private val fromIndices = IntArray(brain.connections.size)
+        private val toIndices = IntArray(brain.connections.size)
+        private val weights = FloatArray(brain.connections.size)
+
+        init {
+            val nodeToIndex = java.util.HashMap<Node, Int>()
+            for (i in 0 until nodeCount) {
+                val node = brain.nodes[i]
+                nodeToIndex[node] = i
+                biases[i] = node.bias
+            }
+
+            val iter = brain.bindings.entries().iterator()
+            while (iter.hasNext()) {
+                val entry = iter.next()
+                val idx = nodeToIndex[entry.value]
+                if (idx != null) {
+                    addressToIndex.put(entry.key, idx)
+                }
+            }
+
+            for (i in 0 until brain.connections.size) {
+                val conn = brain.connections[i]
+                fromIndices[i] = nodeToIndex[conn.from]!!
+                toIndices[i] = nodeToIndex[conn.to]!!
+                weights[i] = conn.weight
+            }
+        }
+
+        fun clear() {
+            for (i in 0 until nodeCount) {
+                state[i] = 0f
+                nextState[i] = 0f
+            }
+        }
+
+        fun setInput(address: Long, value: Float) {
+            val idx = addressToIndex.get(address, -1)
+            if (idx != -1) {
+                state[idx] = value
+            }
+        }
+
+        fun getOutput(address: Long): Float {
+            val idx = addressToIndex.get(address, -1)
+            return if (idx != -1) state[idx] else 0f
+        }
+
+        fun step() {
+            System.arraycopy(biases, 0, nextState, 0, nodeCount)
+            for (i in 0 until weights.size) {
+                nextState[toIndices[i]] += state[fromIndices[i]] * weights[i]
+            }
+            for (i in 0 until nodeCount) {
+                state[i] = tanh(nextState[i])
+            }
+        }
+    }
+
+    fun mergeNodes(idMaster: Long, idVictim: Long) {
+        val nodeM = bindings.get(idMaster) ?: throw IllegalArgumentException("Node $idMaster does not exist.")
+        val nodeV = bindings.get(idVictim) ?: throw IllegalArgumentException("Node $idVictim does not exist.")
+
+        if (idMaster == idVictim) return
+
+        nodeM.bias += nodeV.bias
+
+        val connectionMap = HashMap<Pair<Node, Node>, Float>()
+
+        for (conn in connections) {
+            val newFrom = if (conn.from === nodeV) nodeM else conn.from
+            val newTo = if (conn.to === nodeV) nodeM else conn.to
+
+            val endpoints = Pair(newFrom, newTo)
+            val currentWeight = connectionMap.getOrDefault(endpoints, 0f)
+
+            connectionMap[endpoints] = currentWeight + conn.weight
+        }
+
+        connections.clear()
+        for ((endpoints, weight) in connectionMap) {
+            connections.add(Connection(endpoints.first, endpoints.second, weight))
+        }
+
+        bindings.remove(idVictim)
+        nodes.remove(nodeV)
+    }
+
+    fun cloneOutput(oldId: Long, newId: Long) {
+        val oldNode = bindings.get(oldId) ?: throw IllegalArgumentException("Old node $oldId does not exist.")
+        val newNode = Node()
+
+        newNode.bias = oldNode.bias * 0.5f
+        oldNode.bias *= 0.5f
+
+        nodes.add(newNode)
+        bindings.put(newId, newNode)
+
+        val newConnections = ArrayList<Connection>()
+        for (conn in connections) {
+            if (conn.to === oldNode) {
+                conn.weight *= 0.5f
+                newConnections.add(Connection(conn.from, newNode, conn.weight))
+            }
+        }
+
+        connections.addAll(newConnections)
+    }
+
+    fun cloneInputToMany(oldId: Long, newIds: List<Long>) {
+        val oldNode = bindings.get(oldId) ?: throw IllegalArgumentException("Old node $oldId does not exist.")
+        val fraction = 1f / newIds.size
+        val newConnections = ArrayList<Connection>()
+        for (newId in newIds) {
+            val newNode = Node()
+            nodes.add(newNode)
+            bindings.put(newId, newNode)
+            for (conn in connections) {
+                if (conn.from === oldNode) {
+                    newConnections.add(Connection(newNode, conn.to, conn.weight * fraction))
+                }
+            }
+        }
+        connections.addAll(newConnections)
+    }
+
+    fun cloneOutputToMany(oldId: Long, newIds: List<Long>) {
+        val oldNode = bindings.get(oldId) ?: throw IllegalArgumentException("Old node $oldId does not exist.")
+        val fraction = 1f / newIds.size
+        val newConnections = ArrayList<Connection>()
+        for (newId in newIds) {
+            val newNode = Node()
+            newNode.bias = oldNode.bias * fraction
+            nodes.add(newNode)
+            bindings.put(newId, newNode)
+            for (conn in connections) {
+                if (conn.to === oldNode) {
+                    newConnections.add(Connection(conn.from, newNode, conn.weight * fraction))
+                }
+            }
+        }
+        connections.addAll(newConnections)
+    }
+    // utility function so you don't mess it up
+    fun removeNode(id: Long) {
+        val nodeToRemove = bindings.remove(id) ?: return
+        nodes.remove(nodeToRemove)
+        connections.removeAll { it.from === nodeToRemove || it.to === nodeToRemove }
+    }
+
+    fun cloneInput(oldId: Long, newId: Long) {
+        val oldNode = bindings.get(oldId) ?: throw IllegalArgumentException("Old node $oldId does not exist.")
+        val newNode = Node()
+
+        nodes.add(newNode)
+        bindings.put(newId, newNode)
+
+        val newConnections = ArrayList<Connection>()
+        for (conn in connections) {
+            if (conn.from === oldNode) {
+                conn.weight *= 0.5f
+                newConnections.add(Connection(newNode, conn.to, conn.weight))
+            }
+        }
+
+        connections.addAll(newConnections)
+    }
+}
+</file>
+
+<file path="ClimbingSimulator.kt">
+package com.dubiouscandle.evo
+
+import com.badlogic.gdx.math.Vector2
+import com.badlogic.gdx.physics.box2d.BodyDef
+import com.badlogic.gdx.physics.box2d.FixtureDef
+import com.badlogic.gdx.physics.box2d.PolygonShape
+import kotlin.math.min
+
+class ClimbingSimulator(
+    genome: Genome,
+    val stepWidth: Float = 2f,
+    val stepHeight: Float = 1f,
+    val angle: Float = 0f
+) : SoloSimulator(genome) {
+    init {
+        val groundDef = BodyDef()
+        groundDef.position.set(0f, 0f)
+        val groundBody = world.createBody(groundDef)
+
+        val fixtureDef = FixtureDef()
+        fixtureDef.friction = 1f
+        fixtureDef.filter.categoryBits = 0x0001
+        fixtureDef.filter.maskBits = -1
+
+        for (i in -20..200) {
+            val shape = PolygonShape()
+            val cx = i * stepWidth + stepWidth / 2f
+            val cy = (if (i > 0) i * stepHeight else 0f) - 50f
+            shape.setAsBox(stepWidth / 2f, 50f, Vector2(cx, cy), 0f)
+
+            fixtureDef.shape = shape
+            groundBody.createFixture(fixtureDef)
+            shape.dispose()
+        }
+
+        groundBody.setTransform(groundBody.position, angle)
+
+        var lowestY = Float.MAX_VALUE
+        for (body in creature.bodies) {
+            for (fixture in body.fixtureList) {
+                lowestY = min(lowestY, body.position.y - fixture.shape.radius)
+            }
+        }
+        val shiftY = 1f - lowestY
+        for (body in creature.bodies) {
+            body.setTransform(body.position.x, body.position.y + shiftY, body.angle)
+        }
+    }
+
+    override fun getFitness(): Float {
+        var minX = Float.MAX_VALUE
+        for (body in creature.bodies) {
+            minX = min(body.worldCenter.x, minX)
+        }
+        return if (creature.bodies.isNotEmpty()) minX else 0f
+    }
+}
+</file>
+
+<file path="Creature.kt">
+package com.dubiouscandle.evo
+
+import com.badlogic.gdx.math.Vector2
+import com.badlogic.gdx.physics.box2d.*
+import com.badlogic.gdx.physics.box2d.joints.DistanceJoint
+import com.badlogic.gdx.physics.box2d.joints.DistanceJointDef
+import com.badlogic.gdx.utils.FloatArray
+import kotlin.math.PI
+import kotlin.math.atan2
+import kotlin.math.sqrt
+
+class Creature(val genome: Genome, val world: World, startX: Float, startY: Float) {
+    var fitness = 0
+
+    companion object {
+        internal val BIAS_ADDRESS = InnovationTracker.getNextAddress()
+        private const val CATEGORY_GROUND: Short = 0x0001
+        private const val CATEGORY_CREATURE: Short = 0x0002
+    }
+
+    val processor = genome.brain.processor()
+    val bodies = ArrayList<Body>()
+    val bodyEquilibriumAngle = FloatArray()
+    val joints = ArrayList<DistanceJoint>()
+    val baseLengths = ArrayList<Float>()
+    val edges = ArrayList<Anatomy.Edge>()
+    val nodeMap = HashMap<Anatomy.Node, Body>()
+    val sensorDataMap = HashMap<Anatomy.Sensor, IntArray>()
+
+    val cachedPosX = kotlin.FloatArray(genome.anatomy.nodes.size)
+    val cachedPosY = kotlin.FloatArray(genome.anatomy.nodes.size)
+    val cachedCenterX = kotlin.FloatArray(genome.anatomy.nodes.size) // FIX: Added primitive array cache to bypass JNI overhead
+    val cachedCenterY = kotlin.FloatArray(genome.anatomy.nodes.size) // FIX: Added primitive array cache to bypass JNI overhead
+    val cachedAngle = kotlin.FloatArray(genome.anatomy.nodes.size) // FIX: Added primitive array cache to bypass JNI overhead
+    val cachedVelX = kotlin.FloatArray(genome.anatomy.nodes.size) // FIX: Added primitive array cache to bypass JNI overhead
+    val cachedVelY = kotlin.FloatArray(genome.anatomy.nodes.size) // FIX: Added primitive array cache to bypass JNI overhead
+
+    init {
+        processor.clear()
+
+        for (node in genome.anatomy.nodes) {
+            val def = BodyDef()
+            def.type = BodyDef.BodyType.DynamicBody
+            def.position.set(startX + node.x, startY + node.y)
+            val body = world.createBody(def)
+            body.linearDamping = 0f
+            val shape = CircleShape()
+            shape.radius = sqrt(node.mass) * 0.4f
+
+            val fixtureDef = FixtureDef()
+            fixtureDef.shape = shape
+            fixtureDef.friction = node.friction
+            fixtureDef.restitution = node.restitution
+            fixtureDef.density = 1f
+            fixtureDef.filter.categoryBits = CATEGORY_CREATURE
+            fixtureDef.filter.maskBits = CATEGORY_GROUND
+
+            val mainFixture = body.createFixture(fixtureDef)
+            val bodyContactInfo = IntArray(1)
+            mainFixture.userData = bodyContactInfo // FIX: Assign contact array to main fixture
+            body.userData = bodyContactInfo // FIX: Assign contact array to body for generic access
+
+            for (sensor in node.sensors) { // FIX: Attach circular sensor fixtures directly to the body
+                val sensorShape = CircleShape() // FIX: Create circular shape for sensor
+                sensorShape.radius = sensor.range // FIX: Set radius to sensor maxRange
+                val sensorFixtureDef = FixtureDef() // FIX: Create fixture def for sensor
+                sensorFixtureDef.shape = sensorShape // FIX: Assign shape
+                sensorFixtureDef.isSensor = true // FIX: Make it a sensor so it doesn't cause physical responses
+                sensorFixtureDef.filter.categoryBits = CATEGORY_CREATURE // FIX: Same category
+                sensorFixtureDef.filter.maskBits = CATEGORY_GROUND // FIX: Only collide with ground
+                val sensorFixture = body.createFixture(sensorFixtureDef) // FIX: Attach to body
+                val sensorContactInfo = IntArray(1) // FIX: Create contact tracker for sensor
+                sensorFixture.userData = sensorContactInfo // FIX: Assign to fixture
+                sensorDataMap[sensor] = sensorContactInfo // FIX: Store in map for update loop
+                sensorShape.dispose() // FIX: Clean up shape
+            }
+
+            val massData = MassData()
+            massData.mass = node.mass
+            massData.I = body.inertia
+            body.massData = massData
+
+            shape.dispose()
+            bodies.add(body)
+            nodeMap[node] = body
+        }
+
+        for (edge in genome.anatomy.edges) {
+            val bA = nodeMap[edge.nodeA]
+            val bB = nodeMap[edge.nodeB]
+            if (bA == null || bB == null) {
+                throw IllegalStateException("No node for edge ${edge}")
+            }
+            val def = DistanceJointDef()
+            def.dampingRatio = edge.damping
+            def.frequencyHz = edge.stiffness
+            def.bodyA = bA
+            def.bodyB = bB
+            def.localAnchorA.set(0f, 0f)
+            def.localAnchorB.set(0f, 0f)
+
+            val restLen = Vector2.dst(edge.nodeA.x, edge.nodeA.y, edge.nodeB.x, edge.nodeB.y)
+            def.length = restLen
+
+            val joint = world.createJoint(def) as DistanceJoint
+            joints.add(joint)
+            baseLengths.add(restLen)
+            edges.add(edge)
+        }
+
+        for (i in 0 until genome.anatomy.nodes.size) {
+            val nodeA = genome.anatomy.nodes[i]
+            val body = bodies[i]
+            var sumX = 0f
+            var sumY = 0f
+            for (edge in genome.anatomy.edges) {
+                if (edge.nodeA == nodeA || edge.nodeB == nodeA) {
+                    val otherNode = if (edge.nodeA == nodeA) edge.nodeB else edge.nodeA
+                    val dx = otherNode.x - nodeA.x
+                    val dy = otherNode.y - nodeA.y
+                    val len = sqrt(dx * dx + dy * dy)
+                    if (len > 0.0001f) {
+                        sumX += dx / len
+                        sumY += dy / len
+                    }
+                }
+            }
+            val angle = atan2(sumY, sumX)
+            bodyEquilibriumAngle.add(angle)
+            body.setTransform(body.position, angle)
+        }
+    }
+
+
+    fun update() {
+        for (i in 0 until bodies.size) { // FIX: Cache all Box2D body state variables via a single JNI call per tick
+            val body = bodies[i]
+            val pos = body.position
+            cachedPosX[i] = pos.x
+            cachedPosY[i] = pos.y
+            val center = body.worldCenter
+            cachedCenterX[i] = center.x
+            cachedCenterY[i] = center.y
+            cachedAngle[i] = body.angle
+            val vel = body.linearVelocity
+            cachedVelX[i] = vel.x
+            cachedVelY[i] = vel.y
+        }
+
+        for (i in 0 until bodies.size) {
+            val body = bodies[i]
+            val nodeA = genome.anatomy.nodes[i]
+            var currentSumX = 0f
+            var currentSumY = 0f
+            for (edge in genome.anatomy.edges) {
+                if (edge.nodeA == nodeA || edge.nodeB == nodeA) {
+                    val otherNode = if (edge.nodeA == nodeA) edge.nodeB else edge.nodeA
+                    val otherIndex = genome.anatomy.nodes.indexOf(otherNode) // FIX: Retrieve cached position index
+                    val dx = cachedPosX[otherIndex] - cachedPosX[i] // FIX: Read from array cache instead of JNI
+                    val dy = cachedPosY[otherIndex] - cachedPosY[i] // FIX: Read from array cache instead of JNI
+                    val len = sqrt(dx * dx + dy * dy)
+                    if (len > 0.0001f) {
+                        currentSumX += dx / len
+                        currentSumY += dy / len
+                    }
+                }
+            }
+            val currentTargetAngle = atan2(currentSumY, currentSumX)
+            var angleDiff = (currentTargetAngle - cachedAngle[i]) % (2f * PI.toFloat()) // FIX: Read from array cache instead of JNI
+            if (angleDiff > PI.toFloat()) angleDiff -= 2f * PI.toFloat()
+            if (angleDiff < -PI.toFloat()) angleDiff += 2f * PI.toFloat()
+            body.applyTorque(angleDiff * body.inertia * 6000f, true)
+        }
+
+        var comX = 0f
+        var comY = 0f
+        for (i in 0 until genome.anatomy.nodes.size) {
+            comX += cachedCenterX[i] // FIX: Read from array cache instead of JNI
+            comY += cachedCenterY[i] // FIX: Read from array cache instead of JNI
+        }
+        comX /= genome.anatomy.nodes.size
+        comY /= genome.anatomy.nodes.size
+        processor.setInput(BIAS_ADDRESS, 1f)
+        for (i in 0 until genome.anatomy.nodes.size) {
+            val node = genome.anatomy.nodes[i]
+            val body = bodies[i]
+            processor.setInput(node.xVelocityAddress, cachedVelX[i]) // FIX: Read from array cache instead of JNI
+            processor.setInput(node.yVelocityAddress, cachedVelY[i]) // FIX: Read from array cache instead of JNI
+            processor.setInput(node.xOffsetAddress, cachedPosX[i] - comX) // FIX: Read from array cache instead of JNI
+            processor.setInput(node.yOffsetAddress, cachedPosY[i] - comY) // FIX: Read from array cache instead of JNI
+            processor.setInput(node.contactAddress, if ((body.userData as IntArray)[0] > 0) 1f else 0f) // FIX: Read contact state from IntArray
+
+            for (sensor in node.sensors) {
+                processor.setInput(sensor.inputAddress, if (sensorDataMap[sensor]!![0] > 0) 1f else 0f) // FIX: Check if sensor has overlapping contacts instead of raycasting
+            }
+        }
+        for (i in 0 until genome.anatomy.edges.size) {
+            val edge = edges[i]
+            val indexA = genome.anatomy.nodes.indexOf(edge.nodeA) // FIX: Retrieve cached position index
+            val indexB = genome.anatomy.nodes.indexOf(edge.nodeB) // FIX: Retrieve cached position index
+            val dx = cachedCenterX[indexB] - cachedCenterX[indexA] // FIX: Calculate distance manually from array cache instead of JNI worldCenter.dst
+            val dy = cachedCenterY[indexB] - cachedCenterY[indexA] // FIX: Calculate distance manually from array cache instead of JNI worldCenter.dst
+            val dist = sqrt(dx * dx + dy * dy) // FIX: Calculate distance manually from array cache instead of JNI worldCenter.dst
+            processor.setInput(edge.contractionInputAddress, dist)
+        }
+
+        processor.step()
+
+        for (i in 0 until edges.size) {
+            val edge = edges[i]
+            val joint = joints[i]
+            val restLen = baseLengths[i]
+            val activation = processor.getOutput(edge.contractionOutputAddress)
+
+            val distance = restLen * (1f + activation * (1f - edge.compressionRatio))
+            joint.length = maxOf(0.0001f, distance)
+
+            joint.bodyA.isAwake = true
+            joint.bodyB.isAwake = true
+        }
+    }
+
+    fun destroy() {
+        for (joint in joints) world.destroyJoint(joint)
+        for (body in bodies) world.destroyBody(body)
+    }
+}
+</file>
+
+<file path="Genome.kt">
+package com.dubiouscandle.evo
+
+class Genome(val anatomy: Anatomy, val brain: Brain) {
+    fun deepClone(): Genome {
+        val newAnatomy = Anatomy(anatomy)
+        val newBrain = Brain()
+        val nodeMap = HashMap<Brain.Node, Brain.Node>()
+
+        for (n in brain.nodes) {
+            val nn = Brain.Node(n.bias, n.innovationId)
+            newBrain.nodes.add(nn)
+            nodeMap[n] = nn
+        }
+        val iter = brain.bindings.entries().iterator()
+        while (iter.hasNext()) {
+            val entry = iter.next()
+            newBrain.bindings.put(entry.key, nodeMap[entry.value]!!)
+        }
+        for (c in brain.connections) {
+            newBrain.connections.add(Brain.Connection(nodeMap[c.from]!!, nodeMap[c.to]!!, c.weight, c.innovationId)) // FIX: Explicitly passed the original innovation ID to preserve connection lineage during cloning
+        }
+
+        return Genome(newAnatomy, newBrain)
+    }
+}
+</file>
+
+<file path="Main.kt">
+package com.dubiouscandle.evo
+
+import com.badlogic.gdx.ApplicationAdapter
+import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.Input
+import com.badlogic.gdx.graphics.Color
+import com.badlogic.gdx.graphics.GL20
+import com.badlogic.gdx.graphics.OrthographicCamera
+import com.badlogic.gdx.graphics.g2d.BitmapFont
+import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer
+import com.badlogic.gdx.math.MathUtils.floor
+import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer
+import java.util.*
+import java.util.concurrent.Callable
+import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.Executors
+
+class Main : ApplicationAdapter() {
+    companion object {
+        val seed = System.nanoTime()
+        val random = Random(seed)
+
+        init {
+            println("SEED: $seed")
+        }
+    }
+
+    private val populationSize = 2000
+    private val elitism = floor(populationSize * 0.1f)
+    private val playbackCount = 1
+    private val simulationTicks = 600 // 10 seconds at 60Hz
+    private var generation = 1
+
+    private lateinit var camera: OrthographicCamera
+    private lateinit var hudCamera: OrthographicCamera
+    private lateinit var batch: SpriteBatch
+    private lateinit var font: BitmapFont
+    private lateinit var debugRenderer: Box2DDebugRenderer
+    private lateinit var shapeRenderer: ShapeRenderer // FIX: Added ShapeRenderer to draw custom geometric lines for sensors
+
+    private var population = ArrayList<Genome>()
+    private val config = MutatorConfig()
+    private val mutator: SimpleMutator = SimpleMutator(Random(random.nextLong()), config)
+
+    // Core-bound thread pool for headless parallel evaluation
+    private val threadCount = Runtime.getRuntime().availableProcessors()
+    private val executor = Executors.newFixedThreadPool(threadCount)
+
+    private var playbackSimulators = ArrayList<SoloSimulator>()
+    private var playbackTick = 0
+    private var isSimulating = false
+    private var watchPlayback = false // FIX: Added flag to default to skipping playback (opt-in)
+
+    private val tmpBodies =
+        com.badlogic.gdx.utils.Array<com.badlogic.gdx.physics.box2d.Body>() // FIX: Temporary array to avoid allocating garbage when fetching Box2D bodies
+    private val v1 =
+        com.badlogic.gdx.math.Vector2() // FIX: Reusable vector for dynamic quad rendering to avoid allocation
+    private val v2 =
+        com.badlogic.gdx.math.Vector2() // FIX: Reusable vector for dynamic quad rendering to avoid allocation
+    private val v3 =
+        com.badlogic.gdx.math.Vector2() // FIX: Reusable vector for dynamic quad rendering to avoid allocation
+    private val v4 =
+        com.badlogic.gdx.math.Vector2() // FIX: Reusable vector for dynamic quad rendering to avoid allocation
+
+    override fun create() {
+        camera = OrthographicCamera()
+        camera.setToOrtho(false, 40f, 30f)
+        camera.position.set(0f, 5f, 0f)
+
+        hudCamera = OrthographicCamera()
+        hudCamera.setToOrtho(false, Gdx.graphics.width.toFloat(), Gdx.graphics.height.toFloat())
+
+        batch = SpriteBatch()
+        font = BitmapFont()
+        debugRenderer = Box2DDebugRenderer()
+        shapeRenderer = ShapeRenderer() // FIX: Initialized the native ShapeRenderer
+
+        Gdx.input.inputProcessor = object :
+            com.badlogic.gdx.InputAdapter() { // FIX: Registered an InputAdapter to capture mouse scroll events for zooming
+            override fun scrolled(
+                amountX: Float,
+                amountY: Float
+            ): Boolean { // FIX: Implemented scrolled method to adjust camera zoom
+                camera.zoom += amountY * 0.1f // FIX: Modified camera zoom based on the vertical scroll amount
+                if (camera.zoom < 0.1f) camera.zoom =
+                    0.1f // FIX: Clamped zoom to a minimum of 0.1f to prevent inverted or zero scale
+                camera.update() // FIX: Updated the camera to apply the new zoom level immediately
+                return true // FIX: Consumed the scroll event
+            }
+        } // FIX: Closed the InputAdapter definition
+
+        for (i in 0 until populationSize) {
+            population.add(createStarterGenome())
+        }
+
+        startEvolutionCycle()
+    }
+
+    private fun createStarterGenome(): Genome {
+        val anatomy = Anatomy()
+
+        val nodeCount = 4 // FIX: Replaced truss segments with a fixed node count to form a complete graph (K5)
+        for (i in 0 until nodeCount) { // FIX: Loop to generate nodes in a circular layout for the complete graph
+            val angle =
+                i * (Math.PI * 2) / nodeCount // FIX: Calculate angle to space nodes evenly around a center point
+            val node = Anatomy.Node(
+                (Math.cos(angle) * 2.0).toFloat(),
+                (Math.sin(angle) * 2.0).toFloat(),
+                1f,
+                0.5f,
+                0.1f
+            ) // FIX: Position node on a circle of radius 2
+            node.sensors.add(Anatomy.Sensor(range = 0.55f)) // FIX: Bind a sensor directly to the new node
+            anatomy.nodes.add(node) // FIX: Add the dynamically generated node to the anatomy
+        }
+        for (i in 0 until nodeCount) { // FIX: Iterate through all nodes to establish complete graph connections
+            for (j in i + 1 until nodeCount) { // FIX: Connect to every subsequent node to ensure all distinct pairs are connected exactly once
+                anatomy.edges.add(
+                    Anatomy.Edge(
+                        anatomy.nodes[i],
+                        anatomy.nodes[j],
+                        4f,
+                        0.5f,
+                        0.5f
+                    )
+                ) // FIX: Create structural edge connecting the node pair
+            }
+        }
+
+        val brain = Brain()
+
+        for (node in anatomy.nodes) {
+            for (addr in longArrayOf(
+                node.xOffsetAddress,
+                node.yOffsetAddress,
+                node.xVelocityAddress,
+                node.yVelocityAddress,
+                node.contactAddress
+            )) {
+                val n = Brain.Node()
+                brain.nodes.add(n)
+                brain.bindings.put(addr, n)
+            }
+            for (sensor in node.sensors) { // FIX: Bind initial sensor addresses to the brain so they exist when the mutator attempts to clone them
+                val n = Brain.Node()
+                brain.nodes.add(n)
+                brain.bindings.put(sensor.inputAddress, n)
+            }
+        }
+        for (e in anatomy.edges) {
+            for (addr in longArrayOf(e.contractionInputAddress, e.contractionOutputAddress)) {
+                val n = Brain.Node()
+                brain.nodes.add(n)
+                brain.bindings.put(addr, n)
+            }
+        }
+
+        val biasNode = Brain.Node()
+        brain.nodes.add(biasNode)
+        brain.bindings.put(Creature.BIAS_ADDRESS, biasNode)
+
+        return Genome(anatomy, brain)
+    }
+
+    private fun startEvolutionCycle() {
+        isSimulating = true
+
+        // Push headless computation to background to avoid blocking the OpenGL render thread
+        Thread {
+            val fitnessMap = ConcurrentHashMap<Genome, Float>()
+
+            val tasks = population.map { genome ->
+                Callable {
+                    val sim = RunningSimulator(genome)
+                    for (i in 0 until simulationTicks) {
+                        sim.update(1f / 60f)
+                    }
+                    val fitness = sim.getFitness()
+                    sim.dispose()
+                    fitnessMap[genome] = fitness
+                }
+            }
+            executor.invokeAll(tasks)
+
+            val sortedGenomes = population.sortedByDescending { fitnessMap[it] ?: 0f }
+
+
+            // Post results back to the main thread for LibGDX object creation
+            Gdx.app.postRunnable {
+                preparePlayback(
+                    sortedGenomes,
+                    fitnessMap[sortedGenomes[0]] ?: 0f
+                ) // FIX: Passed the top fitness value to preparePlayback
+            }
+        }.start()
+    }
+
+    private fun preparePlayback(sortedGenomes: List<Genome>, bestFitness: Float) { // FIX: Added bestFitness parameter
+        println("Generation $generation - Best Fitness: $bestFitness,  Brain Size: ${sortedGenomes[0].brain.nodes.size} nodes, ${sortedGenomes[0].brain.connections.size} connections") // FIX: Added best fitness to standard out
+        playbackSimulators.clear()
+        for (i in 0 until playbackCount) {
+            playbackSimulators.add(RunningSimulator(sortedGenomes[i]))
+        }
+        playbackTick = 0
+        isSimulating = false
+
+        population.clear()
+
+        // Elitism: carry over the top 10% unmutated
+        val elites = sortedGenomes.take(elitism)
+        population.addAll(elites.map { it.deepClone() })
+
+        // Populate the remainder by cloning and mutating the top performers
+        while (population.size < populationSize) {
+            val parentIndex = minOf(
+                random.nextInt(populationSize),
+                minOf(random.nextInt(populationSize), random.nextInt(populationSize))
+            ) // FIX: Expanded 3-way tournament selection to sample from the entire population to prevent premature convergence
+            val parent = sortedGenomes[parentIndex]
+            val child = parent.deepClone()
+            mutator.mutate(child)
+            population.add(child)
+        }
+
+        generation++
+    }
+
+    override fun render() {
+        Gdx.gl.glClearColor(0.1f, 0.1f, 0.1f, 1f)
+        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
+
+        if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) { // FIX: Removed touch condition to avoid conflicts with camera dragging
+            watchPlayback = !watchPlayback // FIX: Toggle opt-in state
+        }
+
+        if (isSimulating) {
+            batch.projectionMatrix = hudCamera.combined
+            batch.begin()
+            font.draw(
+                batch,
+                "Simulating Generation $generation across $threadCount threads...",
+                20f,
+                Gdx.graphics.height - 20f
+            )
+            font.draw(
+                batch,
+                "[Playback: ${if (watchPlayback) "ON" else "OFF"}] Press SPACE to toggle",
+                20f,
+                Gdx.graphics.height - 40f
+            ) // FIX: Removed click instruction to match updated toggle logic
+            batch.end()
+            return
+        }
+
+        if (playbackTick < simulationTicks) {
+            if (!watchPlayback) { // FIX: Check opt-in flag before playing back
+                playbackTick = simulationTicks // FIX: Fast-forward tick counter if not opted in
+            } else {
+                for (sim in playbackSimulators) {
+                    sim.update(1f / 60f)
+                }
+                playbackTick++
+
+                if (Gdx.input.isTouched) { // FIX: Replaced auto-tracking with mouse drag polling
+                    camera.translate(
+                        -Gdx.input.deltaX * (camera.viewportWidth / Gdx.graphics.width) * 10f,
+                        Gdx.input.deltaY * (camera.viewportHeight / Gdx.graphics.height) * 10f
+                    ) // FIX: Translate camera by mouse delta scaled to world units
+                    camera.update() // FIX: Update camera to reflect manual translation
+                }
+            }
+        } else {
+            // Once playback is complete, immediately dispose and trigger the next generation calculation
+            for (sim in playbackSimulators) sim.dispose()
+            playbackSimulators.clear()
+            startEvolutionCycle()
+            return
+        }
+
+        Gdx.gl.glEnable(GL20.GL_BLEND) // FIX: Enabled OpenGL blending to allow for transparent sensors
+        Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA) // FIX: Set standard alpha blend function
+
+        shapeRenderer.projectionMatrix =
+            camera.combined // FIX: Align ShapeRenderer to the world camera to draw sensors in physics space
+        shapeRenderer.begin(ShapeRenderer.ShapeType.Filled) // FIX: Begin batching filled shapes instead of lines
+
+        shapeRenderer.color = Color.DARK_GRAY // FIX: Set color for the physical ground
+        for (sim in playbackSimulators) { // FIX: Dynamically render non-creature objects instead of hardcoding the ground
+            sim.world.getBodies(tmpBodies) // FIX: Retrieve all bodies from the current simulation world
+            for (body in tmpBodies) { // FIX: Iterate over the retrieved bodies
+                if (!sim.creature.bodies.contains(body)) { // FIX: Check if the body belongs to the environment rather than the creature
+                    for (fixture in body.fixtureList) { // FIX: Iterate over the fixtures of the environmental body
+                        val shape = fixture.shape // FIX: Get the underlying shape
+                        if (shape is com.badlogic.gdx.physics.box2d.PolygonShape && shape.vertexCount == 4) { // FIX: Support dynamic rendering for four-sided polygons like the ground
+                            shape.getVertex(0, v1) // FIX: Extract local vertex 0
+                            shape.getVertex(1, v2) // FIX: Extract local vertex 1
+                            shape.getVertex(2, v3) // FIX: Extract local vertex 2
+                            shape.getVertex(3, v4) // FIX: Extract local vertex 3
+                            v1.set(body.getWorldPoint(v1)) // FIX: Convert local vertex 0 to world space
+                            v2.set(body.getWorldPoint(v2)) // FIX: Convert local vertex 1 to world space
+                            v3.set(body.getWorldPoint(v3)) // FIX: Convert local vertex 2 to world space
+                            v4.set(body.getWorldPoint(v4)) // FIX: Convert local vertex 3 to world space
+                            shapeRenderer.triangle(
+                                v1.x,
+                                v1.y,
+                                v2.x,
+                                v2.y,
+                                v3.x,
+                                v3.y
+                            ) // FIX: Draw the first triangle of the quad
+                            shapeRenderer.triangle(
+                                v1.x,
+                                v1.y,
+                                v3.x,
+                                v3.y,
+                                v4.x,
+                                v4.y
+                            ) // FIX: Draw the second triangle of the quad
+                        } else if (shape is com.badlogic.gdx.physics.box2d.CircleShape) { // FIX: Support dynamic rendering for circular environmental objects
+                            val worldCenter =
+                                body.getWorldPoint(shape.position) // FIX: Get the circle's position in world space
+                            shapeRenderer.circle(
+                                worldCenter.x,
+                                worldCenter.y,
+                                shape.radius,
+                                16
+                            ) // FIX: Render the circle dynamically
+                        }
+                    }
+                }
+            }
+        }
+
+        shapeRenderer.color = Color(1f, 0f, 0f, 0.25f) // FIX: Make sensors render in red with 75% transparency
+        for (sim in playbackSimulators) { // FIX: Iterate through all creatures currently being rendered
+            for (i in 0 until sim.creature.genome.anatomy.nodes.size) { // FIX: Loop over the anatomy nodes to find their respective sensors
+                val node = sim.creature.genome.anatomy.nodes[i]
+                val body = sim.creature.bodies[i]
+                for (sensor in node.sensors) { // FIX: Draw a line segment outwards from the body position for every sensor using its rotation and range
+                    shapeRenderer.circle(
+                        body.position.x,
+                        body.position.y,
+                        sensor.range,
+                        36
+                    ) // FIX: Render sensors as filled transparent circles
+                }
+            }
+        }
+
+        shapeRenderer.color = Color.WHITE // FIX: Set color for structural edges
+        for (sim in playbackSimulators) { // FIX: Iterate through all creatures to draw their edges
+            for (edge in sim.creature.edges) { // FIX: Loop over the simulated creature's edges
+                val bodyA = sim.creature.nodeMap[edge.nodeA]!! // FIX: Retrieve Box2D body for the start node
+                val bodyB = sim.creature.nodeMap[edge.nodeB]!! // FIX: Retrieve Box2D body for the end node
+                shapeRenderer.rectLine(
+                    bodyA.position.x,
+                    bodyA.position.y,
+                    bodyB.position.x,
+                    bodyB.position.y,
+                    0.1f
+                ) // FIX: Draw edges as thick solid lines
+            }
+        }
+
+        shapeRenderer.color = Color.WHITE // FIX: Set color for solid anatomical nodes
+        for (sim in playbackSimulators) { // FIX: Iterate through all creatures to draw their bodies
+            for (i in 0 until sim.creature.bodies.size) { // FIX: Loop over the anatomy bodies
+                val body = sim.creature.bodies[i] // FIX: Fetch the Box2D body
+                val mass = sim.creature.genome.anatomy.nodes[i].mass // FIX: Fetch node mass
+                shapeRenderer.circle(
+                    body.position.x,
+                    body.position.y,
+                    kotlin.math.sqrt(mass) * 0.4f,
+                    16
+                ) // FIX: Draw anatomical nodes as solid circles
+            }
+        }
+
+        shapeRenderer.end() // FIX: Flush the batch to the GPU
+
+        Gdx.gl.glDisable(GL20.GL_BLEND) // FIX: Disable blending to not interfere with text rendering
+
+        batch.projectionMatrix = hudCamera.combined
+        batch.begin()
+        font.draw(
+            batch,
+            "Generation: ${generation - 1} | Playback Frame: $playbackTick / $simulationTicks",
+            20f,
+            Gdx.graphics.height - 20f
+        )
+        font.draw(
+            batch,
+            "[Playback: ${if (watchPlayback) "ON" else "OFF"}] Press SPACE to toggle",
+            20f,
+            Gdx.graphics.height - 40f
+        ) // FIX: Removed click instruction to match updated toggle logic
+        batch.end()
+    }
+
+    override fun dispose() {
+        batch.dispose()
+        font.dispose()
+        debugRenderer.dispose()
+        shapeRenderer.dispose() // FIX: Free native memory for the shape renderer
+        executor.shutdown()
+        for (sim in playbackSimulators) sim.dispose()
+    }
+}
+</file>
+
+<file path="RunningSimulator.kt">
+package com.dubiouscandle.evo
+
+import com.badlogic.gdx.physics.box2d.BodyDef
+import com.badlogic.gdx.physics.box2d.FixtureDef
+import com.badlogic.gdx.physics.box2d.PolygonShape
+import kotlin.math.min
+
+class RunningSimulator(genome: Genome, slope: Float = 0f) : SoloSimulator(genome) {
+    init {
+        val groundDef = BodyDef()
+        groundDef.position.set(0f, -20f)
+        val groundBody = world.createBody(groundDef)
+        groundBody.setTransform(groundBody.position, slope)
+        val groundShape = PolygonShape()
+        groundShape.setAsBox(1000f, 10f)
+
+        val fixtureDef = FixtureDef()
+        fixtureDef.shape = groundShape
+        fixtureDef.friction = 1f
+        fixtureDef.filter.categoryBits = 0x0001
+        fixtureDef.filter.maskBits = -1
+
+        groundBody.createFixture(fixtureDef)
+        groundShape.dispose()
+
+        var lowestY = Float.MAX_VALUE // FIX: Initialized a variable to track the absolute lowest point of the creature
+        for (body in creature.bodies) { // FIX: Iterated through the creature's bodies to find the lowest Y
+            for (fixture in body.fixtureList) { // FIX: Iterated through each body's fixtures to account for their physical radius
+                lowestY = min(lowestY, body.position.y - fixture.shape.radius) // FIX: Updated lowestY using the body's position minus its radius
+            } // FIX: Concluded fixture iteration
+        } // FIX: Concluded body iteration
+        val shiftY = -9f - lowestY // FIX: Calculated the vertical distance needed to shift the lowest point to the ground's top edge at y = -10
+        for (body in creature.bodies) { // FIX: Iterated through the creature's bodies again to apply the translation
+            body.setTransform(body.position.x, body.position.y + shiftY, body.angle) // FIX: Shifted the body vertically so the creature rests precisely on the ground
+        } // FIX: Concluded translation iteration
+    }
+
+    override fun getFitness(): Float {
+        var minX = Float.MAX_VALUE
+        for (body in creature.bodies) {
+            minX = min(body.worldCenter.x, minX)
+        }
+        return if (creature.bodies.isNotEmpty()) minX else 0f
+    }
+}
+</file>
+
+<file path="SimpleMutator.kt">
+package com.dubiouscandle.evo
+
+import com.badlogic.gdx.math.Vector2
+import java.util.*
+import kotlin.math.cos
+import kotlin.math.sin
+
+data class MutatorConfig(
+    var brainOnly: Float = 0f,
+    var brainSD: Float = 0.1f,
+    var weightMutationChance: Float = 0.15f,
+    var weightSD: Float = 0.01f,
+    var addNodeChance: Float = 0.02f,
+    var removeNodeChance: Float = 0.01f,
+    var addEdgeChance: Float = 0.15f,
+    var removeEdgeChance: Float = 0.01f,
+
+    // node properties
+    var nodePosChance: Float = 0.17f,
+    var nodePosSD: Float = 0.05f,
+    var positionLimiter: ((Float, Float) -> Vector2)? = null,
+
+    // sensor properties
+    var sensorRangeSD: Float = 0.02f,
+    var minSensorRange: Float = 0.1f,
+    var maxSensorRange: Float = 100f,
+
+    // topology mutation
+    var bodyGrowthChance: Float = 0.0001f,
+    var bodyRemoveChance: Float = 0.0001f,
+    var edgeGrowthChance: Float = 0.001f,
+    var edgeRemoveChance: Float = 0.001f,
+
+    //global rotation
+    var rotationSD: Float = TAU * 0.005f,
+)
+
+/*
+Gaussian mutator for genomes
+ */
+class SimpleMutator(
+    val random: Random,
+    val config: MutatorConfig = MutatorConfig()
+) {
+    fun mutate(genome: Genome) {
+        mutateBrain(genome.brain)
+        if (!random.nextBoolean(config.brainOnly)) {
+            mutateNodeProperties(genome.anatomy)
+            mutateSensorProperties(genome.anatomy)
+            mutateRotation(genome.anatomy)
+            mutateTopology(genome)
+        }
+    }
+
+    private fun mutateBrain(brain: Brain) {
+        for (conn in brain.connections) {
+            if (random.nextBoolean(config.weightMutationChance)) {
+                conn.weight += random.gaussianf(config.weightSD)
+            }
+        }
+        for (node in brain.nodes) {
+            if (random.nextBoolean(config.weightMutationChance)) {
+                node.bias += random.gaussianf(config.brainSD)
+            }
+        }
+
+
+        if (brain.connections.isNotEmpty() && random.nextBoolean(config.addNodeChance)) {
+            val connIndex = random.nextInt(brain.connections.size)
+            val oldConn = brain.connections[connIndex]
+            val newNode = Brain.Node()
+            brain.nodes.add(newNode)
+            brain.connections.add(Brain.Connection(oldConn.from, newNode, 1f))
+            brain.connections.add(Brain.Connection(newNode, oldConn.to, oldConn.weight)) // preserve weight
+            brain.connections.removeAt(connIndex)
+        }
+
+        if (brain.nodes.isNotEmpty() && random.nextBoolean(config.addEdgeChance)) {
+            val nodeA = brain.nodes[random.nextInt(brain.nodes.size)]
+            val nodeB = brain.nodes[random.nextInt(brain.nodes.size)]
+            val exists = brain.connections.any { it.from === nodeA && it.to === nodeB }
+            if (!exists) {
+                brain.connections.add(Brain.Connection(nodeA, nodeB, random.gaussianf(config.weightSD)))
+            }
+        }
+
+        if (brain.connections.isNotEmpty() && random.nextBoolean(config.removeEdgeChance)) {
+            brain.connections.removeAt(random.nextInt(brain.connections.size))
+        }
+
+        if (brain.nodes.size > brain.bindings.size && random.nextBoolean(config.removeNodeChance)) {
+            val boundNodes = HashSet<Brain.Node>()
+            for (node in brain.bindings.values()) {
+                boundNodes.add(node)
+            }
+            val hiddenNodes = brain.nodes.filter { it !in boundNodes }
+            if (hiddenNodes.isNotEmpty()) {
+                val nodeToRemove = hiddenNodes[random.nextInt(hiddenNodes.size)]
+                brain.nodes.remove(nodeToRemove)
+                brain.connections.removeAll { it.from === nodeToRemove || it.to === nodeToRemove }
+            }
+        }
+    }
+
+    private fun mutateSensorProperties(anatomy: Anatomy) {
+        for (node in anatomy.nodes) {
+            for (sensor in node.sensors) {
+                sensor.range += random.gaussianf(config.sensorRangeSD)
+                sensor.range = sensor.range.coerceIn(config.minSensorRange, config.maxSensorRange)
+            }
+        }
+    }
+
+    private fun mutateNodeProperties(anatomy: Anatomy) {
+        for (node in anatomy.nodes) {
+            if (!random.nextBoolean(config.nodePosChance)) {
+                continue
+            }
+            val shiftAmount = random.gaussianf(config.nodePosSD)
+            val angle = random.nextFloat() * TAU
+            node.x += shiftAmount * cos(angle)
+            node.y += shiftAmount * sin(angle)
+            if (config.positionLimiter != null) {
+                val pos = config.positionLimiter!!(node.x, node.y)
+                node.x = pos.x
+                node.y = pos.y
+            }
+        }
+    }
+
+    private fun mutateRotation(anatomy: Anatomy) {
+        val angle = random.gaussianf(config.rotationSD)
+        val sin = sin(angle)
+        val cos = cos(angle)
+
+        var centerX = 0f
+        var centerY = 0f
+        var mass = 0f
+        for (node in anatomy.nodes) {
+            centerX += node.x * node.mass
+            centerY += node.y * node.mass
+            mass += node.mass
+        }
+        centerX /= mass
+        centerY /= mass
+
+        for (node in anatomy.nodes) {
+            val relativeX = node.x - centerX
+            val relativeY = node.y - centerY
+
+            val rotatedX = relativeX * cos - relativeY * sin
+            val rotatedY = relativeX * sin + relativeY * cos
+
+            node.x = centerX + rotatedX
+            node.y = centerY + rotatedY
+        }
+    }
+
+    private fun mutateTopology(genome: Genome) { // FIX: Added isolated function to manage anatomical growth and decay
+        val anatomy = genome.anatomy // FIX: Cache anatomy reference
+        val brain = genome.brain // FIX: Cache brain reference
+
+        if (anatomy.edges.isNotEmpty() && random.nextBoolean(config.bodyGrowthChance)) {
+            val boundEdges = anatomy.edges.filter {
+                brain.bindings.containsKey(it.contractionInputAddress) &&
+                    brain.bindings.containsKey(it.contractionOutputAddress)
+            }
+            if (boundEdges.isNotEmpty()) {
+                val targetEdge = boundEdges[random.nextInt(boundEdges.size)]
+                val nodeA = targetEdge.nodeA // FIX: Cache first endpoint
+                val nodeB = targetEdge.nodeB // FIX: Cache second endpoint
+
+                val newNode = Anatomy.Node( // FIX: Instantiate the new node
+                    x = (nodeA.x + nodeB.x) / 2f, // FIX: Position at edge midpoint X
+                    y = (nodeA.y + nodeB.y) / 2f, // FIX: Position at edge midpoint Y
+                    mass = (nodeA.mass + nodeB.mass) / 2, // FIX: Assign default node mass
+                    friction = (nodeA.friction + nodeB.friction) / 2, // FIX: Assign default node friction
+                    restitution = (nodeA.restitution + nodeB.restitution) / 2 // FIX: Assign default node restitution
+                )
+                newNode.sensors.add(Anatomy.Sensor(range = 0.55f)) // FIX: Attach a default sensor to the new node
+
+                brain.cloneInput(
+                    nodeA.xOffsetAddress,
+                    newNode.xOffsetAddress
+                ) // FIX: Cloned parent input topology to seamlessly integrate new node telemetry without disrupting existing movement
+                brain.cloneInput(
+                    nodeA.yOffsetAddress,
+                    newNode.yOffsetAddress
+                ) // FIX: Cloned parent input topology to seamlessly integrate new node telemetry without disrupting existing movement
+                brain.cloneInput(
+                    nodeA.xVelocityAddress,
+                    newNode.xVelocityAddress
+                ) // FIX: Cloned parent input topology to seamlessly integrate new node telemetry without disrupting existing movement
+                brain.cloneInput(
+                    nodeA.yVelocityAddress,
+                    newNode.yVelocityAddress
+                ) // FIX: Cloned parent input topology to seamlessly integrate new node telemetry without disrupting existing movement
+                brain.cloneInput(
+                    nodeA.contactAddress,
+                    newNode.contactAddress
+                ) // FIX: Cloned parent input topology to seamlessly integrate new node telemetry without disrupting existing movement
+
+                if (nodeA.sensors.isNotEmpty()) {
+                    brain.cloneInput(
+                        nodeA.sensors[0].inputAddress,
+                        newNode.sensors[0].inputAddress
+                    ) // FIX: Cloned parent sensor input topology to maintain learned reflex chains
+                } else {
+                    val n = Brain.Node() // FIX: Create matching brain node
+                    brain.nodes.add(n) // FIX: Add to network
+                    brain.bindings.put(newNode.sensors[0].inputAddress, n) // FIX: Bind address
+                }
+
+                anatomy.nodes.add(newNode) // FIX: Add the fully initialized node to the creature's anatomy
+
+                anatomy.edges.remove(targetEdge) // FIX: Remove the original split edge
+
+                val edge1 = Anatomy.Edge(
+                    nodeA,
+                    newNode,
+                    targetEdge.stiffness,
+                    targetEdge.damping,
+                    targetEdge.compressionRatio
+                ) // FIX: Create first half of the split edge
+                val edge2 = Anatomy.Edge(
+                    newNode,
+                    nodeB,
+                    targetEdge.stiffness,
+                    targetEdge.damping,
+                    targetEdge.compressionRatio
+                ) // FIX: Create second half of the split edge
+                anatomy.edges.add(edge1) // FIX: Add first half to anatomy
+                anatomy.edges.add(edge2) // FIX: Add second half to anatomy
+
+                brain.cloneInputToMany(
+                    targetEdge.contractionInputAddress,
+                    listOf(edge1.contractionInputAddress, edge2.contractionInputAddress)
+                ) // FIX: Clone old edge input to new half
+                brain.cloneOutputToMany(
+                    targetEdge.contractionOutputAddress,
+                    listOf(edge1.contractionOutputAddress, edge2.contractionOutputAddress)
+                ) // FIX: Clone old edge output to new half
+
+                val closestNode = anatomy.nodes.filter { it !== newNode && it !== nodeA && it !== nodeB }
+                    .minByOrNull { (it.x - newNode.x) * (it.x - newNode.x) + (it.y - newNode.y) * (it.y - newNode.y) } // FIX: Find the closest node excluding the split endpoints for stabilization
+
+                if (closestNode != null) {
+                    val stableEdge = Anatomy.Edge(newNode, closestNode, 5f, 0.5f, 0.5f)
+                    anatomy.edges.add(stableEdge)
+
+                    // Add missing bindings for the new stabilization edge
+                    for (addr in longArrayOf(stableEdge.contractionInputAddress, stableEdge.contractionOutputAddress)) {
+                        val n = Brain.Node()
+                        brain.nodes.add(n)
+                        brain.bindings.put(addr, n)
+                    }
+                }
+                brain.removeNode(targetEdge.contractionOutputAddress)
+                brain.removeNode(targetEdge.contractionInputAddress) // Add this
+            }
+
+        }
+
+        if (anatomy.nodes.size > 1 && random.nextBoolean(config.bodyRemoveChance)) { // FIX: Roll for body removal, ensuring we don't delete the final node
+            val nodeToRemove =
+                anatomy.nodes[random.nextInt(anatomy.nodes.size)] // FIX: Select random node to destroy
+            anatomy.nodes.remove(nodeToRemove) // FIX: Remove node from anatomy
+
+            val edgesToRemove =
+                anatomy.edges.filter { it.nodeA === nodeToRemove || it.nodeB === nodeToRemove } // FIX: Identify any edges connected to the dead node
+            anatomy.edges.removeAll(edgesToRemove) // FIX: Remove all orphaned edges to prevent simulation crashes
+
+            brain.removeNode(nodeToRemove.xOffsetAddress) // FIX: Unbind deleted node telemetry from brain
+            brain.removeNode(nodeToRemove.yOffsetAddress) // FIX: Unbind deleted node telemetry from brain
+            brain.removeNode(nodeToRemove.xVelocityAddress) // FIX: Unbind deleted node telemetry from brain
+            brain.removeNode(nodeToRemove.yVelocityAddress) // FIX: Unbind deleted node telemetry from brain
+            brain.removeNode(nodeToRemove.contactAddress) // FIX: Unbind deleted node telemetry from brain
+            for (sensor in nodeToRemove.sensors) { // FIX: Loop deleted sensors
+                brain.removeNode(sensor.inputAddress) // FIX: Unbind deleted sensor telemetry from brain
+            }
+            for (edge in edgesToRemove) { // FIX: Loop deleted edges
+                brain.removeNode(edge.contractionInputAddress) // FIX: Unbind deleted edge IO from brain
+                brain.removeNode(edge.contractionOutputAddress) // FIX: Unbind deleted edge IO from brain
+            }
+        }
+
+// SimpleMutator.kt - mutateTopology(), edgeGrowthChance block
+        if (anatomy.nodes.size > 1 && random.nextBoolean(config.edgeGrowthChance)) {
+            val nodeA = anatomy.nodes[random.nextInt(anatomy.nodes.size)]
+            val nodeB = anatomy.nodes[random.nextInt(anatomy.nodes.size)]
+            if (nodeA !== nodeB) {
+                val edgeExists = anatomy.edges.any {
+                    (it.nodeA === nodeA && it.nodeB === nodeB) ||
+                        (it.nodeA === nodeB && it.nodeB === nodeA)
+                }
+                if (!edgeExists) {
+                    // FIX: Search for cloneSource BEFORE adding newEdge to anatomy.edges
+                    val cloneSource = anatomy.edges.firstOrNull {
+                        it.nodeA === nodeA || it.nodeB === nodeA ||
+                            it.nodeA === nodeB || it.nodeB === nodeB
+                    }
+
+                    val newEdge = Anatomy.Edge(nodeA, nodeB, 5f, 0.5f, 0.5f)
+                    anatomy.edges.add(newEdge) // now added after the search
+
+                    if (cloneSource != null) {
+                        brain.cloneInput(cloneSource.contractionInputAddress, newEdge.contractionInputAddress)
+                        brain.cloneOutput(cloneSource.contractionOutputAddress, newEdge.contractionOutputAddress)
+                    } else {
+                        for (addr in longArrayOf(
+                            newEdge.contractionInputAddress,
+                            newEdge.contractionOutputAddress
+                        )) {
+                            val n = Brain.Node()
+                            brain.nodes.add(n)
+                            brain.bindings.put(addr, n)
+                        }
+                    }
+                }
+            }
+        }
+        if (anatomy.edges.isNotEmpty() && random.nextBoolean(config.edgeRemoveChance)) { // FIX: Added chance for isolated edge removal
+            val edgeToRemove =
+                anatomy.edges[random.nextInt(anatomy.edges.size)] // FIX: Select a random existing edge
+            anatomy.edges.remove(edgeToRemove)
+            brain.removeNode(edgeToRemove.contractionInputAddress)
+            brain.removeNode(edgeToRemove.contractionOutputAddress) // FIX: Clean up the associated neural output binding
+        }
+    }
+}
+</file>
+
+<file path="SoloSimulator.kt">
+package com.dubiouscandle.evo
+
+import com.badlogic.gdx.math.Vector2
+import com.badlogic.gdx.physics.box2d.*
+
+abstract class SoloSimulator(
+    genome: Genome,
+    val world: World = World(Vector2(0f, -9.81f), true)
+) : ContactListener {
+    val creature: Creature
+
+    init {
+        world.setContactListener(this)
+        world.setContinuousPhysics(false)
+        creature = Creature(genome, world, 0f, 0f)
+    }
+
+    fun update(dt: Float = 1f / 60f) {
+        world.step(dt, 2, 1)
+        creature.update()
+    }
+
+    abstract fun getFitness(): Float
+
+    fun dispose() {
+        creature.destroy()
+        world.dispose()
+    }
+
+    override fun beginContact(contact: Contact) {
+        val udA = contact.fixtureA.userData
+        val udB = contact.fixtureB.userData
+        if (udA is IntArray) udA[0]++
+        if (udB is IntArray) udB[0]++
+    }
+
+    override fun endContact(contact: Contact) {
+        val udA = contact.fixtureA.userData
+        val udB = contact.fixtureB.userData
+        if (udA is IntArray) udA[0]--
+        if (udB is IntArray) udB[0]--
+    }
+
+    override fun preSolve(contact: Contact, oldManifold: Manifold) {}
+    override fun postSolve(contact: Contact, impulse: ContactImpulse) {}
+}
+</file>
+
+<file path="todo.txt">
+# speciation
+# sexual reproduction
+# dynamic mutation rates
+# create a better ui
+
+# coevolution (multiple creatures in the same world)
+</file>
+
+<file path="Utils.kt">
+package com.dubiouscandle.evo
+
+import java.util.*
+import java.util.concurrent.atomic.AtomicLong
+
+const val PI = Math.PI.toFloat()
+const val TAU = 2 * Math.PI.toFloat()
+
+fun normAngle(angle: Float): Float {
+    return ((angle % TAU) + TAU) % TAU
+}
+
+fun Random.gaussianf(sd: Float): Float {
+    return nextGaussian().toFloat() * sd
+}
+fun Random.nextBoolean(trueChance: Float): Boolean {
+    return nextFloat() < trueChance
+}
+
+fun FloatArray.transform(func: (Float) -> Float) {
+    for (i in 0..<size) {
+        this[i] = func(this[i])
+    }
+}
+
+object InnovationTracker {
+    private val nextAddress = AtomicLong(0)
+    fun getNextAddress(): Long = nextAddress.getAndIncrement()
+}
+</file>
+
+</files>
