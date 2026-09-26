@@ -20,9 +20,9 @@ Projects I remember clearly and know are interactive/runnable.
 
 Projects that took between 1 day to 1 week.
 
-* [`dragoncurvegenerator`] - Interactive Dragon Curve renderer
-* [`poly smash`] - 2D arcade-style game
-* [`pool`] - Playable pool game
+* dragoncurvegenerator — Interactive Dragon Curve renderer
+* poly smash — 2D arcade-style game
+* pool — Playable pool game
 
 ## Everything else
 
