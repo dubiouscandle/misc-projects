@@ -10,11 +10,11 @@ Projects I remember clearly and know are interactive/runnable.
 
 ### Multi-day projects
 
-* silly-car-game134 - 2D physics-based racing game where you build your own car
-* dubiousdl - Neural-network library and MNIST dataset experiments
+* silly-car-game134 — 2D physics-based racing game where you build your own car
+* dubiousdl — Neural-network library and MNIST dataset experiments
 * Evo — Physics simulation where virtual creatures evolve their bodies and neural networks at the same time
-* pointphysics - Position Based Dynamics (PBD) physics engine and experiments
-* north_korea_game - A silly negotiation game involving the leader of North Korea
+* pointphysics — Position Based Dynamics (PBD) physics engine and experiments
+* north_korea_game — A silly negotiation game involving the leader of North Korea
 
 ### Small projects
 
