@@ -16,7 +16,7 @@ Projects I know are interactive/runnable and took atleast a few days to make.
 * [TicTacToe3D](https://github.com/dubiouscandle/misc-projects/tree/master/misc-projects/TicTacToe3D) — A 4x4x4 tic-tac-toe game where I built a highly cursed 3D rendering and click-interaction pipeline entirely from scratch.
 * [super-image-maker-from-balls](misc-projects/super-image-maker-from-balls-master) — A from-scratch deterministic physics simulation. It simulates balls falling into a pile, reverse-maps their final resting positions to an image's pixels, and color-codes their initial states so you can watch them fall into place to form the picture.
 * [poly-smash](https://github.com/dubiouscandle/misc-projects/tree/master/misc-projects/poly%20smash) — Arcade shooter game; shoot the enemies and upgrade your gun. Try to survive until the end!
-*   
+  
 ## Everything else
 
 The rest of the archive is a random mix of smaller projects, experiments, USACO practice, half-finished ideas, old versions, and things I haven't looked at in years.
