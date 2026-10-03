@@ -10,12 +10,14 @@ Projects I know are interactive/runnable and took atleast a few days to make.
 
 * [Silly Car Game](https://github.com/dubiouscandle/misc-projects/tree/master/misc-projects/silly-car-game134) — 2D physics-based racing game where you build your own car
 * [DubiousDL](https://github.com/dubiouscandle/misc-projects/tree/master/misc-projects/dubiousdl) — Neural-network library and MNIST dataset experiments
-* [EvoMK](https://github.com/dubiouscandle/misc-projects/tree/master/misc-projects/Evo) — Physics simulation where virtual creatures evolve their bodies and neural networks at the same time
-* [Point-Physics](https://github.com/dubiouscandle/misc-projects/tree/master/misc-projects/pointphysics) — Position Based Dynamics (PBD) physics engine and experiments
-* [North-Korea-Game](https://github.com/dubiouscandle/misc-projects/tree/master/misc-projects/north_korea_game) — A silly negotiation game involving the leader of North Korea
+* [EvoMK](https://github.com/dubiouscandle/misc-projects/tree/master/misc-projects/Evo) — Physics simulation where virtual creatures evolve their bodies and neural networks at the same time. Most creatures were runners, but some evolved wheels and other crazy stuff, which was pretty cool.
+* [Point-Physics](https://github.com/dubiouscandle/misc-projects/tree/master/misc-projects/pointphysics) — Position Based Dynamics (PBD) physics engine and experiments.
+* [North-Korea-Game](https://github.com/dubiouscandle/misc-projects/tree/master/misc-projects/north_korea_game) — A silly negotiation game involving the leader of North Korea.
 * [TicTacToe3D](https://github.com/dubiouscandle/misc-projects/tree/master/misc-projects/TicTacToe3D) — A 4x4x4 tic-tac-toe game where I built a highly cursed 3D rendering and click-interaction pipeline entirely from scratch.
-* [super-image-maker-from-balls](https://github.com/dubiouscandle/misc-projects/blob/master/misc-projects/super-image-maker-from-balls-master.zip) — A from-scratch deterministic physics simulation. It simulates balls falling into a pile, reverse-maps their final resting positions to an image's pixels, and color-codes their initial states so you can watch them fall into place to form the picture.
-* [poly-smash](https://github.com/dubiouscandle/misc-projects/tree/master/misc-projects/poly%20smash) — Arcade shooter game; shoot the enemies and upgrade your gun. Try to survive until the end!
+* [super-image-maker-from-balls](misc-projects/super-image-maker-from-balls-master) — A from-scratch deterministic physics simulation. It simulates balls falling into a pile, reverse-maps their final resting positions to an image's pixels, and color-codes their initial states so you can watch them fall into place to form the picture.
+* [poly-smash](https://github.com/dubiouscandle/misc-projects/tree/master/misc-projects/poly%20smash) — Arcade shooter game; shoot the enemies and upgrade your gun. Try to survive until the end! Personal favorite btw.
+
+The 
   
 ## Everything else
 
